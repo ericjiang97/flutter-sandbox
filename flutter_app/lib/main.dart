@@ -1,7 +1,8 @@
-import 'dart:convert' as JSON;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart';
+import 'dart:convert'; // for the utf8.encode method
 
 void main() => runApp(MyApp());
 
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Metro Trains App',
       theme: ThemeData(
         //
         // Try running your application with "flutter run". You'll see the
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blueGrey,
       ),
-      home: MyHomePage(title: 'Flutter'),
+      home: MyHomePage(title: 'Find a Station'),
     );
   }
 }
@@ -49,50 +50,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var _data = [];
-  var _timestamp = 0;
+  var station = '';
 
   @override
   void initState() {
     super.initState();
-
-    this.getData();
   }
 
-  void getData() {
-    print('Refreshing data...');
-    try {
-      String uri = "https://gnews.io/api/v3/top-news?token=b14095179ca6bb4c641971a693a776d1";
-      Future<http.Response> response = http.get(uri);
-      response.then((resp){
-        final jsonResp = JSON.jsonDecode(resp.body);
-        final articles = jsonResp["articles"];
-        print(articles);
-        setState(() {
-          _data= articles;
-          _timestamp= jsonResp['timestamp'];
-        });
-      });
-
-    } catch(e){
-      print(e);
-    }
+  Future<String> createAPIRequest(request) {
+    
+    // Imagine that this function is more complex and slow
+    return Future.delayed(Duration(seconds: 4), () => 'Large Latte');
   }
 
-  List<Card> getList(){
-    List<Card> articlesList = [];
-    for(var item in _data){
-      articlesList.add(
-          Card(
-            child: Column(
-              children: <Widget>[
-                Text(item['title'])
-              ],
-            ),
-          )
-      );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -133,17 +103,38 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Text('News Articles'),
             ),
             Column(
-              children: <Widget>[_data != null ? getList() :  Text('No Data.')]
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter Station',
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      station= text;
+                    });
+                  },
+                ),
+                FlatButton(
+                  color: Colors.blue,
+                  textColor: Colors.white,
+                  disabledColor: Colors.grey,
+                  disabledTextColor: Colors.black,
+                  padding: EdgeInsets.all(8.0),
+                  splashColor: Colors.blueAccent,
+                  onPressed: () {
+                  /*...*/
+                  },
+                  child: Text(
+                  "Search Station",
+                  )
+                )
+              ]
             )
           ],
 
           ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getData,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
